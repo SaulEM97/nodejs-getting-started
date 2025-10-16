@@ -14,7 +14,7 @@ app.get('/', (req, res) => {
   res.render('pages/index')
 })
 
-const server = app.listen(port, () => {
+const server = app.listen(port, '0.0.0.0', () => {
   console.log(`Listening on ${port}`)
 })
 
