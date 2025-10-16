@@ -1,4 +1,4 @@
 #!/bin/bash
 echo "🚀 Starting Node.js app..."
-npm start &
+nohup node index.js > app.log 2>&1 &
 
