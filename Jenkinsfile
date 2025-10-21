@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        AWS_DEFAULT_REGION = 'us-east-1'  // Adjust if needed
+        AWS_DEFAULT_REGION = 'us-east-1'
         ANSIBLE_INVENTORY = 'ansible/inventory.ini'
         PLAYBOOK = 'ansible/playbook_nodejs.yaml'
     }
@@ -25,18 +25,16 @@ pipeline {
                         usernameVariable: 'SSH_USER'
                     )
                 ]) {
-		    sh '''
-		    #!/bin/bash
-		    mkdir -p ~/.ssh
-		    chmod 700 ~/.ssh
+                    sh '''
+                    mkdir -p ~/.ssh
+                    chmod 700 ~/.ssh
 
-		    # Use bash-compatible loop
-		    while read host; do
-    		    ssh-keyscan -H $host >> ~/.ssh/known_hosts
-		    done <<< "$(grep -v '^#' $ANSIBLE_INVENTORY | awk '{print $1}')"
+                    grep -v '^#' $ANSIBLE_INVENTORY | awk '{print $1}' | while read host; do
+                        ssh-keyscan -H "$host" >> ~/.ssh/known_hosts
+                    done
 
-		    chmod 644 ~/.ssh/known_hosts
-		    '''
+                    chmod 644 ~/.ssh/known_hosts
+                    '''
                 }
             }
         }
@@ -53,14 +51,10 @@ pipeline {
                     )
                 ]) {
                     sh '''
-                    # Export AWS credentials
                     export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
                     export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
 
-                    # Test connection
                     ansible all -i $ANSIBLE_INVENTORY -m ping -u $SSH_USER --private-key $SSH_KEY
-
-                    # Run playbook
                     ansible-playbook -i $ANSIBLE_INVENTORY $PLAYBOOK -u $SSH_USER --private-key $SSH_KEY
                     '''
                 }
@@ -68,3 +62,4 @@ pipeline {
         }
     }
 }
+
