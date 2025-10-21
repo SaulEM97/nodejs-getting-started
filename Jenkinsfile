@@ -25,16 +25,15 @@ pipeline {
                         usernameVariable: 'SSH_USER'
                     )
                 ]) {
-                    sh '''
-                    mkdir -p ~/.ssh
-                    chmod 700 ~/.ssh
-                    
-                    grep -v '^#' $ANSIBLE_INVENTORY | grep -v '^\\[' | awk '{split($2,a,"="); print a[2]}' | while read host; do
-                        [ -n "$host" ] && ssh-keyscan -H "$host" >> ~/.ssh/known_hosts
-                    done
-                     
-                    chmod 644 ~/.ssh/known_hosts
-                    '''
+                   sh '''
+                   mkdir -p ~/.ssh
+                   chmod 700 ~/.ssh
+
+                   # Add known hosts explicitly
+                   ssh-keyscan -H 35.170.81.7 >> ~/.ssh/known_hosts
+
+                   chmod 644 ~/.ssh/known_hosts
+                   '''
                 }
             }
         }
