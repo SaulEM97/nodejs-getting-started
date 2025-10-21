@@ -1,0 +1,70 @@
+---
+- name: Build, test, and deploy Node.js application
+  hosts: all
+  become: yes
+  vars:
+    app_dir: /opt/my-node-app
+    repo_url: "https://github.com/SaulEM97/nodejs-getting-started.git"
+    node_version: "18.x"
+
+  tasks:
+
+    - name: Ensure curl is installed
+      apt:
+        name: curl
+        state: present
+      when: ansible_os_family == "Debian"
+
+    - name: Install Node.js (Debian-based systems)
+      shell: |
+        curl -fsSL https://deb.nodesource.com/setup_{{ node_version }} | bash -
+        apt-get install -y nodejs
+      when: ansible_os_family == "Debian"
+
+    - name: Ensure git is installed
+      package:
+        name: git
+        state: present
+
+    - name: Clone or update repository
+      git:
+        repo: "{{ repo_url }}"
+        dest: "{{ app_dir }}"
+        version: main
+        force: yes
+
+    - name: Install npm dependencies
+      npm:
+        path: "{{ app_dir }}"
+        production: no
+
+    - name: Run tests
+      command: npm test
+      args:
+        chdir: "{{ app_dir }}"
+      register: test_result
+      ignore_errors: yes
+
+    - name: Fail if tests failed
+      fail:
+        msg: "Unit tests failed — deployment aborted."
+      when: test_result.rc != 0
+
+    - name: Install pm2 globally
+      npm:
+        name: pm2
+        global: yes
+        state: present
+
+    - name: Start application with pm2
+      shell: pm2 start index.js --name "my-node-app" -f
+      args:
+        chdir: "{{ app_dir }}"
+      become: yes
+      become_user: ubuntu
+
+    - name: Save pm2 process list and enable startup
+      shell: |
+        pm2 save
+        pm2 startup systemd -u {{ ansible_user }} --hp /home/{{ ansible_user }}
+
