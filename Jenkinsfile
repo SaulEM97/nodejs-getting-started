@@ -29,7 +29,7 @@ pipeline {
                     mkdir -p ~/.ssh
                     chmod 700 ~/.ssh
 
-                    grep -v '^#' $ANSIBLE_INVENTORY | awk '{print $1}' | while read host; do
+                    grep -v '^#' $ANSIBLE_INVENTORY | awk '{split($2,a,"="); print a[2]}' | while read host; do
                         ssh-keyscan -H "$host" >> ~/.ssh/known_hosts
                     done
 
