@@ -62,9 +62,3 @@
         chdir: "{{ app_dir }}"
       become: yes
       become_user: ubuntu
-
-    - name: Save pm2 process list and enable startup
-      shell: |
-        pm2 save
-        pm2 startup systemd -u {{ ansible_user }} --hp /home/{{ ansible_user }}
-

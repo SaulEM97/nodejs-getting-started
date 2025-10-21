@@ -1,0 +1,15 @@
+Procedimiento por pasos
+
+1.- Ejecutar "podman build -t jenkins-node ." # Containerfile Instala nodejs, npm, podman, ansible y python3.
+2.- Ejecutar "podman run -d --name jenkins -p 8080:8080 -p 50000:50000 -v jenkins_home:/var/jenkins_home jenkins-node:latest"
+3.- Agregar en variables.tfvars la Access Key ID y Secret Access Key.
+4.- Ejecutar "terraform init", "terraform plan --var-file variables.tfvars -out terraform.tfplan" y "terraform apply 'terraform.tfplan'" 
+    # Levanta la instancia EC2 en AWS, Access Key ID y Secret Access Key (Cómo mejorar para más seguridad?).
+    # Anotar la IP pública de la instancia.
+4.- En Jenkins agregar 3 credenciales, 2 Secret Text (AWS_ACCESS_KEY_ID Y AWS_SECRET_ACCESS_KEY)
+    1 SSH Username with private key (ANSIBLE_SSH_KEY).
+5.- En el inventory.ini cambiar la IP pública.
+6.- Agregar nuevo item (Pipeline script for SCM/ Git/ github repository URL).
+7.- En el Jenkinsfile cambiar la IP pública en la stage "Prepare SSH & Known Hosts".
+7.- Build now y checar.       
+
