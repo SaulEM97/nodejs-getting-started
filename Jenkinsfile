@@ -29,10 +29,9 @@ pipeline {
                     mkdir -p ~/.ssh
                     chmod 700 ~/.ssh
                     
-                    grep -v '^#' $ANSIBLE_INVENTORY | grep -v '^\[' | awk '{split($2,a,"="); print a[2]}' | while read host; do
-                       ssh-keyscan -H "$host" >> ~/.ssh/known_hosts
+                    grep -v '^#' $ANSIBLE_INVENTORY | grep -v '^\\[' | awk '{split($2,a,"="); print a[2]}' | while read host; do
+                        [ -n "$host" ] && ssh-keyscan -H "$host" >> ~/.ssh/known_hosts
                     done
-
                      
                     chmod 644 ~/.ssh/known_hosts
                     '''
