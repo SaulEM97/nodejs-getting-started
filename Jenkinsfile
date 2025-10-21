@@ -30,7 +30,7 @@ pipeline {
                    chmod 700 ~/.ssh
 
                    # Add known hosts explicitly
-                   ssh-keyscan -H 35.170.81.7 >> ~/.ssh/known_hosts
+                   ssh-keyscan -H 13.221.219.150 >> ~/.ssh/known_hosts
 
                    chmod 644 ~/.ssh/known_hosts
                    '''
