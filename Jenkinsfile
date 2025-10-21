@@ -25,18 +25,18 @@ pipeline {
                         usernameVariable: 'SSH_USER'
                     )
                 ]) {
-                    sh '''
-                    # Create SSH directory
-                    mkdir -p ~/.ssh
-                    chmod 700 ~/.ssh
+		    sh '''
+		    #!/bin/bash
+		    mkdir -p ~/.ssh
+		    chmod 700 ~/.ssh
 
-                    # Add all hosts from inventory to known_hosts
-                    while read host; do
-                        ssh-keyscan -H $host >> ~/.ssh/known_hosts
-                    done < <(grep -v '^#' $ANSIBLE_INVENTORY | awk '{print $1}')
+		    # Use bash-compatible loop
+		    while read host; do
+    		    ssh-keyscan -H $host >> ~/.ssh/known_hosts
+		    done <<< "$(grep -v '^#' $ANSIBLE_INVENTORY | awk '{print $1}')"
 
-                    chmod 644 ~/.ssh/known_hosts
-                    '''
+		    chmod 644 ~/.ssh/known_hosts
+		    '''
                 }
             }
         }
